@@ -17,6 +17,18 @@ $background-color: #ecf0f1;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+  .old-user{
+    p{
+      margin: 10px 0;
+      .login-link{
+        text-decoration: none;
+      }
+      .login-link:hover{
+        color: $primary-color;
+      }
+    }
+  }
 }
 
 .form-group {
