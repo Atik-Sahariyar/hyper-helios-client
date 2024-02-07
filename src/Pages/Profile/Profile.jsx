@@ -1,6 +1,77 @@
+import { useForm } from "react-hook-form";
 import "./profile.scss";
+import axios from "axios";
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import { useQuery } from "@tanstack/react-query";
+import Swal from "sweetalert2";
+import { Link } from "react-router-dom";
+
+const image_hosting_key = import.meta.env.VITE_IMAGE_HOSTING_KEY;
+const image_hosting_api = `https://api.imgbb.com/1/upload?key=${image_hosting_key}`;
 
 const Profile = () => {
+  const { register, handleSubmit, reset } = useForm();
+  const axiosPublic = useAxiosPublic();
+
+  const { data: contacts, refetch } = useQuery({
+    queryKey: ["contacts"],
+    queryFn: async () => {
+      const res = await axiosPublic.get("/contacts/");
+      return res.data;
+    },
+  });
+
+  const handleContact = async (data) => {
+    const name = data.name;
+    const phone_number = data.phoneNumber;
+    const imageFile = { image: data.image[0] };
+    const division = data.division;
+    const url = await axios.post(image_hosting_api, imageFile, {
+      headers: {
+        "content-type": "multipart/form-data",
+      },
+    });
+    const image = url?.data?.data?.display_url || "";
+
+    const contactInfo = {
+      name,
+      division,
+      phone_number,
+      image,
+    };
+
+    const res = await axiosPublic.post("contacts/create/", contactInfo);
+
+    if (res.data) {
+      refetch();
+      reset();
+    }
+  };
+
+  const handleDeleteContact = async (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to delete this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axiosPublic.delete(`contacts/delete/${id}`).then((res) => {
+          if (res.data)
+            Swal.fire({
+              title: "Deleted!",
+              text: "Your contact has been deleted.",
+              icon: "success",
+            });
+          refetch();
+        });
+      }
+    });
+  };
+
   return (
     <div className="profile-container">
       <h1>Profile Page</h1>
@@ -16,8 +87,47 @@ const Profile = () => {
 
       {/* Contacts Section */}
       <div className="contacts-section">
-        <h2>My Contacts</h2>
 
+      
+        {/* Add Contact Form */}
+        <h2>Add new contact</h2>
+        <form
+          onSubmit={handleSubmit(handleContact)}
+          className="add-contact-form"
+        >
+          <input
+            type="text"
+            {...register("name")}
+            placeholder="Name"
+            required
+          />
+          <input
+            type="number"
+            {...register("phoneNumber")}
+            placeholder="Phone Number"
+            required
+          />
+          <input
+            type="file"
+            {...register("image")}
+            placeholder="Upload a image"
+            id="image"
+            required
+          />
+          <select {...register("division")} required>
+            <option value="Dhaka">Dhaka</option>
+            <option value="Rajshahi">Rajshahi</option>
+            <option value="Chittagong">Chittagong</option>
+            <option value="Khulna">Khulna</option>
+            <option value="Barisal">Barisal</option>
+            <option value="Sylhet">Sylhet</option>
+            <option value="Rangpur">Rangpur</option>
+            <option value="Mymensingh">Mymensingh</option>
+          </select>
+          <button type="submit">Add Contact</button>
+        </form>
+
+        <h2>My Contacts</h2>
         {/* Contacts Table */}
         <table className="contacts-table">
           {/* Table Headers */}
@@ -33,41 +143,24 @@ const Profile = () => {
           </thead>
           {/* Table Body (Dynamic Content) */}
           <tbody>
-            <tr>
-              <td>
-                <img src="contact-avatar.jpg" alt="Contact Avatar" />
-              </td>
-              <td>John Doe</td>
-              <td>123-456-7890</td>
+            {contacts?.map((contact) => (
+              <tr key={contact.id}>
+                <td>
+                  <img src={contact.image} alt="Contact Avatar" />
+                </td>
+                <td>{contact.name}</td>
+                <td>{contact.phone_number}</td>
 
-              <td>Dhaka</td>
-              <td className="actions">
-                <button className="edit-btn">Edit</button>
-                <button className="delete-btn">Delete</button>
-              </td>
-            </tr>
-            {/* Add more rows dynamically based on contacts data */}
+                <td>{contact.division}</td>
+                <td className="actions">
+                  <Link to={`updateContact/${contact.id}`}><button  className="edit-btn">Edit</button></Link>
+                  <button onClick={() => handleDeleteContact(contact.id)} className="delete-btn">Delete</button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
 
-        {/* Add Contact Form */}
-        <h3>Add new contact</h3>
-        <div className="add-contact-form">
-        
-          <input type="text" placeholder="Name" />
-          <input type="number" placeholder="Phone Number" />
-          <select>
-            <option value="Dhaka">Dhaka</option>
-            <option value="Rajshahi">Rajshahi</option>
-            <option value="Chittagong">Chittagong</option>       
-            <option value="Khulna">Khulna</option>
-            <option value="Barisal">Barisal</option>
-            <option value="Sylhet">Sylhet</option>
-            <option value="Rangpur">Rangpur</option>
-            <option value="Mymensingh">Mymensingh</option>
-          </select>
-          <button>Add Contact</button>
-        </div>
       </div>
     </div>
   );

@@ -1,0 +1,41 @@
+
+.container{
+    margin: 10px;
+    padding: 10px;
+
+    h2{ 
+        margin:  5px 0;
+    }
+    .add-contact-form {
+        display: flex;
+        gap: 10px;
+    
+        input, select, button {
+          padding: 8px;
+        }
+    
+        button {
+          background-color: #27ae60;
+          color: #fff;
+          cursor: pointer;
+          border: none;
+        }
+      }
+}
+
+
+
+  @media screen and (max-width: 768px) {
+      .add-contact-form {
+        flex-direction: column;
+
+        input, select, button {
+          width: 100%;
+        }
+
+        button {
+          margin-top: 10px;
+        }
+      }
+
+  }

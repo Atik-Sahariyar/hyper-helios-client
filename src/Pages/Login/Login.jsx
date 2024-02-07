@@ -1,25 +1,41 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./login.scss";
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import { useForm } from "react-hook-form";
+
+
 const Login = () => {
+  const { register, handleSubmit, reset } = useForm();
+  const axiosPublic = useAxiosPublic();
+  const navigate = useNavigate();
+
+  const handleLogin  = async(data) => {
+      const res = await axiosPublic.post("/dj-rest-auth/login/", data);
+      console.log(res);
+      if(res.data){
+        navigate("/profile")
+        reset();
+      }
+  }
   return (
     <div className="login-container">
-      <form className="login-form">
+      <form onSubmit={handleSubmit(handleLogin)} className="login-form">
         <div className="form-group">
-          <label htmlFor="username">Username:</label>
+          <label htmlFor="username">Email:</label>
           <input
             type="text"
-            id="username"
-            name="username"
-            placeholder="Enter username"
+            {...register("email")}
+            placeholder="Enter email"
+            required
           />
         </div>
         <div className="form-group">
           <label htmlFor="password">Password:</label>
           <input
             type="password"
-            id="password"
-            name="password"
+            {...register("password")}
             placeholder="Enter password"
+            required
           />
         </div>
         <button type="submit" className="login-button">
