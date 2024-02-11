@@ -1,22 +1,26 @@
 import { useForm } from "react-hook-form";
 import "./profile.scss";
-import axios from "axios";
-import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import axiosImgHost from "axios";
 import { useQuery } from "@tanstack/react-query";
 import Swal from "sweetalert2";
 import { Link } from "react-router-dom";
+import useInterceptor from "../../Hooks/useInterceptor";
+import { useContext } from "react";
+import { AuthContext } from "../../Providers/AuthProvider";
+import defaultProfile from "../../../src/assets/default_profile_image.jpg"
 
 const image_hosting_key = import.meta.env.VITE_IMAGE_HOSTING_KEY;
 const image_hosting_api = `https://api.imgbb.com/1/upload?key=${image_hosting_key}`;
 
 const Profile = () => {
   const { register, handleSubmit, reset } = useForm();
-  const axiosPublic = useAxiosPublic();
+  const axios = useInterceptor();
+  const { user } = useContext(AuthContext);
 
   const { data: contacts, refetch } = useQuery({
     queryKey: ["contacts"],
     queryFn: async () => {
-      const res = await axiosPublic.get("/contacts/");
+      const res = await axios.get("/contacts/");
       return res.data;
     },
   });
@@ -26,7 +30,8 @@ const Profile = () => {
     const phone_number = data.phoneNumber;
     const imageFile = { image: data.image[0] };
     const division = data.division;
-    const url = await axios.post(image_hosting_api, imageFile, {
+
+    const url = await axiosImgHost.post(image_hosting_api, imageFile, {
       headers: {
         "content-type": "multipart/form-data",
       },
@@ -40,7 +45,7 @@ const Profile = () => {
       image,
     };
 
-    const res = await axiosPublic.post("contacts/create/", contactInfo);
+    const res = await axios.post("contacts/create/", contactInfo);
 
     if (res.data) {
       refetch();
@@ -59,7 +64,7 @@ const Profile = () => {
       confirmButtonText: "Yes, delete it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        axiosPublic.delete(`contacts/delete/${id}`).then((res) => {
+        axios.delete(`contacts/delete/${id}`).then((res) => {
           if (res.data)
             Swal.fire({
               title: "Deleted!",
@@ -78,10 +83,10 @@ const Profile = () => {
 
       {/* User Details Section */}
       <div className="user-details">
-        <img src="user-avatar.jpg" alt="User Avatar" />
+        <img src={user.image ? user.image : defaultProfile} alt="User Avatar" />
         <div className="user-info">
-          <h2>John Doe</h2>
-          <p>john@example.com</p>
+          <h2>{user?.username}</h2>
+          <p>{user?.email}</p>
         </div>
       </div>
 

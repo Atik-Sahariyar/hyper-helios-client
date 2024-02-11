@@ -1,31 +1,36 @@
 import { Link, useNavigate } from "react-router-dom";
 import "./signup.scss";
 import { useForm } from "react-hook-form";
-import useAxiosPublic from "../../Hooks/useAxiosPublic";
-
+import Swal from "sweetalert2";
+import Cookies from "js-cookie";
+import useInterceptor from "../../Hooks/useInterceptor";
 
 const SignUp = () => {
   const { register, handleSubmit, reset } = useForm();
-  const axiosPublic = useAxiosPublic();
-  const navigate = useNavigate()
+  const axios = useInterceptor();
+  const navigate = useNavigate();
 
   const onSubmit = async (data) => {
-   
     const { username, password1, password2, email } = data;
     const formData = { username, password1, password2, email };
 
     try {
-      const response = await axiosPublic.post("/dj-rest-auth/registration/", formData);
-      if(response){
-      reset();
-      navigate("/profile")
+      const response = await axios.post(
+        "/dj-rest-auth/registration/",
+        formData
+      );
+      console.log(response);
+      if (response) {
+        reset();
+        console.log(response?.config?.data);
+        Cookies.set('accessToken', response?.data?.access)
+        Swal("Registraion successfull")
+        navigate("/login");
       }
-      
     } catch (error) {
       console.error("Error during registration:", error);
     }
   };
-
 
   return (
     <div className="signup-container">
@@ -62,7 +67,7 @@ const SignUp = () => {
             placeholder="Confirm password"
           />
         </div>
-      
+
         <button type="submit" className="signup-button">
           Signup
         </button>

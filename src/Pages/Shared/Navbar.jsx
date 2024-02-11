@@ -1,28 +1,25 @@
 
 import { Link, useNavigate } from "react-router-dom";
 import "./navbar.scss";
-import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import useInterceptor from "../../Hooks/useInterceptor";
+import Cookies from "js-cookie";
 
 const Navbar = () => {
-  const axiosPublic = useAxiosPublic();
+  const axios = useInterceptor();
   const navigate = useNavigate();
 
   const handleLogout = async() => {
-    const res = await axiosPublic.post("/dj-rest-auth/logout/");
+    const res = await axios.post("/dj-rest-auth/logout/");
     if(res.data){
+      Cookies.remove('accessToken')
       navigate("/")
     }
   }
 
   return (
     <nav className="navbar">
-      <a href="/" className="logo">
-        Logo
-      </a>
+      <img src="https://i.ibb.co/JnGVSFP/logo.png" alt="logo"  className="logo"/>
       <div className={`nav-links`}>
-        <Link to="/" clLinkssName="nav-link">
-          Home
-        </Link>
         <Link to="/profile" className="nav-link">
           Profile
         </Link>

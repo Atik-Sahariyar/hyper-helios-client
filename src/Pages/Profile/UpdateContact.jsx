@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import "./updateContact.scss"
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import useAxiosPublic from "../../Hooks/useInterceptor";
 import axios from "axios";
 
 const image_hosting_key = import.meta.env.VITE_IMAGE_HOSTING_KEY;
@@ -48,7 +48,7 @@ const UpdateContact = () => {
         image,
       };
   
-      const res = await axiosPublic.patch(`contacts/update/${id}`, contactInfo);
+      const res = await axiosPublic.patch(`contacts/update/${id}/`, contactInfo);
       console.lo
       if (res.data) {
         navigate("/profile")

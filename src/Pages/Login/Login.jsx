@@ -1,18 +1,20 @@
 import { Link, useNavigate } from "react-router-dom";
 import "./login.scss";
-import useAxiosPublic from "../../Hooks/useAxiosPublic";
 import { useForm } from "react-hook-form";
+import Cookies from "js-cookie";
+import useInterceptor from "../../Hooks/useInterceptor";
 
 
 const Login = () => {
   const { register, handleSubmit, reset } = useForm();
-  const axiosPublic = useAxiosPublic();
+  const axios = useInterceptor();
   const navigate = useNavigate();
 
   const handleLogin  = async(data) => {
-      const res = await axiosPublic.post("/dj-rest-auth/login/", data);
+      const res = await axios.post("/dj-rest-auth/login/", data);
       console.log(res);
-      if(res.data){
+      if(res){
+        Cookies.set('accessToken', res?.data?.access)
         navigate("/profile")
         reset();
       }
