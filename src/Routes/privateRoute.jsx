@@ -3,14 +3,15 @@ import { Navigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../Providers/AuthProvider";
 
 const PrivateRoute = ({ children }) => {
-  const { isLoggedIn, loading } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
   const location = useLocation();
-
+   
+  console.log("loading: ", loading, " user: ", user)
   if (loading) {
     return <progress className="text-center progress w-56"></progress>;
   }
-  
-  if (isLoggedIn) {
+
+  if (user) {
     return children;
   }
 

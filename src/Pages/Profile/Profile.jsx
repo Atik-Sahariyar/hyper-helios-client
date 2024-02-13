@@ -6,8 +6,9 @@ import Swal from "sweetalert2";
 import { Link } from "react-router-dom";
 import useInterceptor from "../../Hooks/useInterceptor";
 import { useContext } from "react";
-import { AuthContext } from "../../Providers/AuthProvider";
+// import { AuthContext } from "../../Providers/AuthProvider";
 import defaultProfile from "../../../src/assets/default_profile_image.jpg"
+import { AuthContext } from "../../Providers/authProvider";
 
 const image_hosting_key = import.meta.env.VITE_IMAGE_HOSTING_KEY;
 const image_hosting_api = `https://api.imgbb.com/1/upload?key=${image_hosting_key}`;

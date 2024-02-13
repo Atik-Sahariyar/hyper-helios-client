@@ -35,6 +35,10 @@ $text-color: #01171d;
     &:hover {
       color: $primary-color;
     }
+    &.active-link {
+      color: $primary-color;
+      font-weight: bold; 
+    }
   }
 }
 
